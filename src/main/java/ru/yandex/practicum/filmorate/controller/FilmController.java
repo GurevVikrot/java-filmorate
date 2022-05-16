@@ -40,7 +40,7 @@ public class FilmController {
     public String updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен для обновления film: {}", film);
 
-        if (film.getId() == null || !films.containsKey(film.getId())) {
+        if (film.getId() == null) {
             log.warn("Фильма нет в коллекции или он не создан, невозможно обновить");
             throw new ValidationException("Фильма нет в коллекции или он не создан, невозможно обновить");
         }

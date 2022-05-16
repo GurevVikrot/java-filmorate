@@ -24,18 +24,18 @@ public class UserController {
     private final Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
-    public String createUser(@Valid @RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         log.info("Получен для создания user: {}", user);
         checkAndSetId(user);
         checkLoginAndName(user);
         users.put(user.getId(), user);
         log.info("User: {} успешно создан", user);
-        return "Учетная запись успешно создана";
+        return user;
     }
 
     @PutMapping
     public String updateUser(@Valid @RequestBody User user) {
-        if (user.getId() == null || !users.containsKey(user.getId())) {
+        if (user.getId() == null) {
             log.warn("Ошибка обновления учетной записи, пользователя не существует user: {}", user);
             throw new ValidationException("Ошибка обновления учетной записи, пользователя не существует");
         }
