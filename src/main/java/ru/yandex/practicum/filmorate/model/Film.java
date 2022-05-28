@@ -8,11 +8,14 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NotNull
 public class Film {
     private final LocalDate releaseDate;
+    private final Set<Integer> likesByUsers = new HashSet<>();
 
     @NotNull
     @Positive(message = "Длительность фильма должна быть положительной")
@@ -33,5 +36,19 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+    }
+
+    public boolean addLike(Integer userId) {
+        if (userId == null) return false;
+        return likesByUsers.add(userId);
+    }
+
+    public int getLikesNumber() {
+        return likesByUsers.size();
+    }
+
+    public boolean deleteLike(Integer userId) {
+        if (userId == null) return false;
+        return likesByUsers.remove(userId);
     }
 }

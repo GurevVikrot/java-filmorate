@@ -7,10 +7,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 @NotNull
 public class User {
+    private final Set<Integer> friends = new TreeSet<>();
+
     @NotBlank(message = "login не может быть пустым")
     private final String login;
     private Integer id;
@@ -29,5 +35,19 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
+    }
+
+    public boolean addFriend(Integer id) {
+        if (id == null) return false;
+        return friends.add(id);
+    }
+
+    public boolean removeFriend(Integer id) {
+        if (id == null) return false;
+        return friends.remove(id);
+    }
+
+    public List<Integer> getFriendsId() {
+        return new ArrayList<>(friends);
     }
 }

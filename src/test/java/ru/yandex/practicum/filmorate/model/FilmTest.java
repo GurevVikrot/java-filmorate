@@ -10,6 +10,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -104,5 +105,36 @@ class FilmTest {
 
         film.setDescription(film.getDescription() + "a");
         assertFalse(validator.validate(film).isEmpty());
+    }
+
+    @Test
+    void correctAddLikeTest() {
+        assertTrue(film.addLike(1));
+        assertTrue(film.addLike(2));
+    }
+
+    @Test
+    void addExistLikes() {
+        assertTrue(film.addLike(1));
+        assertFalse(film.addLike(1));
+        assertFalse(film.addLike(null));
+    }
+
+    @Test
+    void deleteLikeTest() {
+        assertTrue(film.addLike(1));
+        assertTrue(film.deleteLike(1));
+        assertFalse(film.deleteLike(1));
+        assertFalse(film.deleteLike(null));
+    }
+
+    @Test
+    void getLikesTest() {
+        assertEquals(0, film.getLikesNumber());
+
+        film.addLike(1);
+        film.addLike(2);
+        film.addLike(3);
+        assertEquals(3, film.getLikesNumber());
     }
 }

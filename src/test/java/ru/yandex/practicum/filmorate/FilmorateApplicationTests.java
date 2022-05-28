@@ -6,11 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class FilmorateApplicationTests {
-
-	UserController userController = new UserController();
-
 	@Test
 	void contextLoads() {
 	}
-
 }
