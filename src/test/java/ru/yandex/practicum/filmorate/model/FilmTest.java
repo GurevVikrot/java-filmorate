@@ -117,7 +117,7 @@ class FilmTest {
     void addExistLikes() {
         assertTrue(film.addLike(1));
         assertFalse(film.addLike(1));
-        assertFalse(film.addLike(null));
+        assertTrue(film.addLike(2));
     }
 
     @Test
@@ -125,7 +125,7 @@ class FilmTest {
         assertTrue(film.addLike(1));
         assertTrue(film.deleteLike(1));
         assertFalse(film.deleteLike(1));
-        assertFalse(film.deleteLike(null));
+        assertFalse(film.deleteLike(0));
     }
 
     @Test

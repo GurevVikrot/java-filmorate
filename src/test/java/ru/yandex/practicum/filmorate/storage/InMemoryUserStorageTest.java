@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryUserStorageTest {
@@ -19,20 +18,19 @@ class InMemoryUserStorageTest {
     void beforeEach() {
         storage = new InMemoryUserStorage();
         user = new User("a@mail.ru", "login", "name", LocalDate.of(1990, 10, 10));
-        user.setId(0);
     }
 
     @Test
     void createUserTest() {
         assertTrue(storage.getAllUsers().isEmpty());
-        assertTrue(storage.createUser(user));
+        assertTrue(storage.createUser(user).isPresent());
 
         User user1 = new User("a@mail.ru", "login", "name", LocalDate.of(1990, 10, 10));
         user1.setId(user.getId());
 
-        assertFalse(storage.createUser(user));
+        assertFalse(storage.createUser(user).isPresent());
         assertEquals(1, storage.getAllUsers().size());
-        assertEquals(user1, storage.getUser(user.getId()));
+        assertEquals(user1, storage.getUser(user.getId()).orElse(null));
     }
 
     @Test
@@ -41,7 +39,7 @@ class InMemoryUserStorageTest {
         User user1 = new User("a@mail.ru", "up", "date", LocalDate.of(1990, 10, 10));
         user1.setId(user.getId());
         assertTrue(storage.updateUser(user1));
-        assertEquals(user1, storage.getUser(user1.getId()));
+        assertEquals(user1, storage.getUser(user1.getId()).orElse(null));
     }
 
     @Test
@@ -68,8 +66,8 @@ class InMemoryUserStorageTest {
     @Test
     void getUserTest() {
         storage.createUser(user);
-        assertEquals(user, storage.getUser(user.getId()));
-        assertNull(storage.getUser(-1));
+        assertEquals(user, storage.getUser(user.getId()).orElse(null));
+        assertFalse(storage.getUser(-1).isPresent());
     }
 
     @Test
@@ -77,9 +75,7 @@ class InMemoryUserStorageTest {
         assertEquals(0, storage.getAllUsers().size());
         storage.createUser(user);
         User user1 = new User("1a@mail.ru", "1log", "1name", LocalDate.of(1990, 10, 10));
-        user1.setId(1);
         User user2 = new User("2a@mail.ru", "2log", "2name", LocalDate.of(1990, 10, 10));
-        user1.setId(2);
         storage.createUser(user1);
         storage.createUser(user2);
         assertEquals(3, storage.getAllUsers().size());

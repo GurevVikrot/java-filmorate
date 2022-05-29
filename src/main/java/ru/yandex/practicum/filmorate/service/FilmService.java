@@ -9,15 +9,15 @@ public interface FilmService {
 
     Film updateFilm(Film film);
 
-    String deleteFilm(Integer id);
+    String deleteFilm(long id);
 
-    Film getFilm(Integer id);
+    Film getFilm(long id);
 
     List<Film> getFilms();
 
-    boolean addLikeToFilm(Integer FilmId, Integer UserId);
+    boolean addLikeToFilm(long FilmId, long UserId);
 
-    boolean removeLikeFromFilm(Integer FilmId, Integer UserId);
+    boolean removeLikeFromFilm(long FilmId, long UserId);
 
     List<Film> getTopFilms(Integer count);
 }

@@ -9,7 +9,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryFilmStorageTest {
@@ -25,14 +24,14 @@ class InMemoryFilmStorageTest {
 
     @Test
     void correctSaveTest() {
-        assertTrue(filmStorage.saveFilm(film));
-        assertEquals(film, filmStorage.getFilm(film.getId()));
+        assertTrue(filmStorage.saveFilm(film).isPresent());
+        assertEquals(film, filmStorage.getFilm(film.getId()).orElse(null));
     }
 
     @Test
     void saveExistFilm() {
-        assertTrue(filmStorage.saveFilm(film));
-        assertFalse(filmStorage.saveFilm(film));
+        assertTrue(filmStorage.saveFilm(film).isPresent());
+        assertFalse(filmStorage.saveFilm(film).isPresent());
         assertEquals(1, filmStorage.getFilms().size());
     }
 
@@ -42,15 +41,15 @@ class InMemoryFilmStorageTest {
         assertEquals(1, filmStorage.getFilms().size());
 
         Film updatedFilm = new Film("Up", "date", LocalDate.of(2020, 12, 12), 100);
-        updatedFilm.setId(0);
+        updatedFilm.setId(1);
 
         assertTrue(filmStorage.updateFilm(updatedFilm));
-        assertEquals(updatedFilm, filmStorage.getFilm(updatedFilm.getId()));
+        assertEquals(updatedFilm, filmStorage.getFilm(updatedFilm.getId()).orElse(null));
         assertEquals(1, filmStorage.getFilms().size());
     }
 
     @Test
-    void updateNonexistFilm() {
+    void updateNonexistentFilm() {
         assertFalse(filmStorage.updateFilm(film));
         assertEquals(0, filmStorage.getFilms().size());
     }
@@ -58,17 +57,17 @@ class InMemoryFilmStorageTest {
     @Test
     void getFilmTest() {
         filmStorage.saveFilm(film);
-        assertEquals(film, filmStorage.getFilm(film.getId()));
-        assertNull(filmStorage.getFilm(-1));
+        assertEquals(film, filmStorage.getFilm(film.getId()).orElse(null));
+        assertFalse(filmStorage.getFilm(-1).isPresent());
     }
 
     @Test
     void deleteFilmTest() {
         filmStorage.saveFilm(film);
-        assertEquals(film, filmStorage.getFilm(film.getId()));
+        assertEquals(film, filmStorage.getFilm(film.getId()).orElse(null));
 
         filmStorage.deleteFilm(film.getId());
-        assertNull(filmStorage.getFilm(film.getId()));
+        assertFalse(filmStorage.getFilm(film.getId()).isPresent());
         assertEquals(0, filmStorage.getFilms().size());
 
         assertFalse(filmStorage.deleteFilm(0));
@@ -79,11 +78,8 @@ class InMemoryFilmStorageTest {
         assertEquals(0, filmStorage.getFilms().size());
 
         Film film1 = new Film("1film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film1.setId(1);
         Film film2 = new Film("2film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film2.setId(2);
         Film film3 = new Film("3film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film3.setId(3);
 
         filmStorage.saveFilm(film);
         filmStorage.saveFilm(film1);
@@ -98,17 +94,16 @@ class InMemoryFilmStorageTest {
         assertEquals(0, filmStorage.getTopFilms(10).size());
 
         Film film1 = new Film("1film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film1.setId(1);
         Film film2 = new Film("2film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film2.setId(2);
         Film film3 = new Film("3film", "desc", LocalDate.of(2020, 12, 12), 100);
-        film3.setId(3);
+        Film film4 = new Film("3film", "desc", LocalDate.of(2020, 12, 12), 100);
 
         filmStorage.saveFilm(film);
         filmStorage.saveFilm(film1);
         filmStorage.saveFilm(film2);
         filmStorage.saveFilm(film3);
-        assertEquals(4, filmStorage.getTopFilms(10).size());
+        filmStorage.saveFilm(film4);
+        assertEquals(5, filmStorage.getTopFilms(10).size());
 
         film.addLike(1);
         film.addLike(2);
@@ -128,18 +123,19 @@ class InMemoryFilmStorageTest {
         filmStorage.updateFilm(film1);
         filmStorage.updateFilm(film2);
         filmStorage.updateFilm(film3);
+        filmStorage.updateFilm(film4);
 
-        List<Film> topFilms = List.of(film, film1, film2, film3);
+        List<Film> topFilms = List.of(film, film1, film2, film3, film4);
         assertEquals(topFilms, filmStorage.getTopFilms(10));
 
-        film3.addLike(1);
         film3.addLike(2);
         film3.addLike(3);
         film3.addLike(4);
         film3.addLike(5);
+        film3.addLike(6);
         filmStorage.updateFilm(film3);
 
-        List<Film> topFilms2 = List.of(film3, film, film1, film2);
+        List<Film> topFilms2 = List.of(film3, film, film1, film2, film4);
         assertEquals(topFilms2, filmStorage.getTopFilms(10));
     }
 }

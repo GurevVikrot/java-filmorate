@@ -11,12 +11,12 @@ import ru.yandex.practicum.filmorate.util.ValidationException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class DefaultFilmService implements FilmService {
     private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
-    private static int idCounter = 1;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -29,12 +29,12 @@ public class DefaultFilmService implements FilmService {
     @Override
     public Film createFilm(Film film) {
         checkDateFilm(film);
-        checkAndSetId(film);
+        checkNonexistentId(film);
         checkSpace(film);
-
-        if (filmStorage.saveFilm(film)) {
+        Optional<Film> filmOptional = filmStorage.saveFilm(film);
+        if (filmOptional.isPresent()) {
             log.info("film: {} успешно создан", film);
-            return filmStorage.getFilm(film.getId());
+            return filmOptional.get();
         }
 
         log.info("При добавлении фильма в хранилище что-то пошло не так, film: {}", film);
@@ -43,17 +43,12 @@ public class DefaultFilmService implements FilmService {
 
     @Override
     public Film updateFilm(Film film) {
-        if (film.getId() == null) {
-            log.warn("Не возможно обновить фильм, id = null");
-            throw new ValidationException("Не возможно обновить фильм, id = null");
-        }
-
         checkSpace(film);
         checkDateFilm(film);
 
         if (filmStorage.updateFilm(film)) {
             log.info("film успешно обновлен: {}", film);
-            return filmStorage.getFilm(film.getId());
+            return getFromStorage(film.getId());
         }
 
         log.warn("Ошибка обновления фильма, фильма не существует: {}", film);
@@ -61,7 +56,7 @@ public class DefaultFilmService implements FilmService {
     }
 
     @Override
-    public String deleteFilm(Integer id) {
+    public String deleteFilm(long id) {
         if (filmStorage.deleteFilm(id)) {
             log.info("film c id = {} удален", id);
             return "Фильм удален";
@@ -72,15 +67,8 @@ public class DefaultFilmService implements FilmService {
     }
 
     @Override
-    public Film getFilm(Integer id) {
-        Film film = filmStorage.getFilm(id);
-
-        if (film == null) {
-            log.info("Ошибка получения фильма, фильма с id = {} не существует", id);
-            throw new StorageException("Фильма не существует или передан id неверного формата");
-        }
-
-        return film;
+    public Film getFilm(long id) {
+        return getFromStorage(id);
     }
 
     @Override
@@ -89,13 +77,8 @@ public class DefaultFilmService implements FilmService {
     }
 
     @Override
-    public boolean addLikeToFilm(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-
-        if (film == null) {
-            log.warn("Ошибка добавления like фильму, фильма не существует в коллекции");
-            throw new StorageException("Невозможно поставить like несуществующему фильму");
-        }
+    public boolean addLikeToFilm(long filmId, long userId) {
+        Film film = getFromStorage(filmId);
 
         if (userStorage.userExist(userId) && film.addLike(userId)) {
             filmStorage.updateFilm(film);
@@ -109,12 +92,9 @@ public class DefaultFilmService implements FilmService {
     }
 
     @Override
-    public boolean removeLikeFromFilm(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        if (film == null) {
-            log.warn("Ошибка удаления like фильма, фильма не существует в коллекции");
-            throw new StorageException("Невозможно удалить like у несуществующего фильма");
-        }
+    public boolean removeLikeFromFilm(long filmId, long userId) {
+        Film film = getFromStorage(filmId);
+
         if (userStorage.userExist(userId) && film.deleteLike(userId)) {
             filmStorage.updateFilm(film);
             log.info("Удален like у фильма id = {} от пользователя с id = {}", filmId, userId);
@@ -131,10 +111,8 @@ public class DefaultFilmService implements FilmService {
         return filmStorage.getTopFilms(count);
     }
 
-    private void checkAndSetId(Film film) {
-        if (film.getId() == null) {
-            film.setId(idCounter++);
-        } else if (film.getId() >= 0) {
+    private void checkNonexistentId(Film film) {
+        if (film.getId() > 0) {
             log.warn("Ошибка создания фильма, получен фильм с изначально заданным id");
             throw new ValidationException("Ошибка создания фильма, неверный формат id");
         }
@@ -142,11 +120,10 @@ public class DefaultFilmService implements FilmService {
 
     private void checkSpace(Film film) {
         if (film.getName().startsWith(" ")) {
-            log.warn("Ошибка создания фильма, название начинается с ' '");
-            throw new ValidationException("Ошибка создания фильма, название не может начинаться с пробела");
-        } else if (film.getDescription().startsWith(" ")) {
-            log.warn("Ошибка создания фильма, описание начинается с ' '");
-            throw new ValidationException("Ошибка создания фильма, описание не может начинаться с пробела");
+            film.setName(film.getName().trim());
+        }
+        if (film.getDescription().startsWith(" ")) {
+            film.setDescription(film.getDescription().trim());
         } else {
             film.setName(film.getName().trim());
             film.setDescription(film.getDescription().trim());
@@ -158,5 +135,10 @@ public class DefaultFilmService implements FilmService {
             log.warn("Время выпуска фильма меньше минимальной даты: 28-12-1895 film: {}", film);
             throw new ValidationException("Время выпуска фильма меньше минимальной даты: 28-12-1895");
         }
+    }
+
+    private Film getFromStorage(Long id) {
+        return filmStorage.getFilm(id).orElseThrow(() -> new StorageException("Фильма не существует",
+                "Ошибка получения фильма id = {} из хранилища, возращен null"));
     }
 }

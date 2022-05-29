@@ -7,19 +7,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private static int idCounter = 1;
+    private final Map<Long, Film> films = new HashMap<>();
 
     @Override
-    public boolean saveFilm(Film film) {
-        if (!films.containsKey(film.getId())) {
+    public Optional<Film> saveFilm(Film film) {
+        if (film.getId() == 0) {
+            film.setId(idCounter++);
             films.put(film.getId(), film);
-            return true;
+            return Optional.of(film);
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
@@ -32,15 +35,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilm(Integer id) {
-        if (films.containsKey(id)) {
-            return films.get(id);
-        }
-        return null;
+    public Optional<Film> getFilm(long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
-    public boolean deleteFilm(Integer id) {
+    public boolean deleteFilm(long id) {
         if (films.containsKey(id)) {
             films.remove(id);
             return true;

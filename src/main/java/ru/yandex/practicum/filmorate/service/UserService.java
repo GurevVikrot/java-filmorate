@@ -9,17 +9,17 @@ public interface UserService {
 
     User updateUser(User user);
 
-    String deleteUser(Integer id);
+    String deleteUser(long id);
 
     List<User> getUsers();
 
-    List<User> getUserFriends(Integer id);
+    List<User> getUserFriends(long id);
 
-    List<User> getMutualFriends(Integer userId, Integer friendId);
+    List<User> getMutualFriends(long userId, long friendId);
 
-    User addToFriends(Integer userId, Integer friendId);
+    User addToFriends(long userId, long friendId);
 
-    String removeFromFriends(Integer userId, Integer friendId);
+    String removeFromFriends(long userId, long friendId);
 
-    User getUser(Integer id);
+    User getUser(long id);
 }

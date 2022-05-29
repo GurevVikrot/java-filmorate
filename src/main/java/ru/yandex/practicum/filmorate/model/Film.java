@@ -15,13 +15,13 @@ import java.util.Set;
 @NotNull
 public class Film {
     private final LocalDate releaseDate;
-    private final Set<Integer> likesByUsers = new HashSet<>();
+    private final Set<Long> likesByUsers = new HashSet<>();
 
     @NotNull
     @Positive(message = "Длительность фильма должна быть положительной")
     private final Integer duration;
 
-    private Integer id;
+    private long id;
 
     @NotBlank(message = "Название фильма не может быть пустым")
     @NotEmpty(message = "Название фильма не может быть пустым")
@@ -38,8 +38,7 @@ public class Film {
         this.duration = duration;
     }
 
-    public boolean addLike(Integer userId) {
-        if (userId == null) return false;
+    public boolean addLike(long userId) {
         return likesByUsers.add(userId);
     }
 
@@ -47,8 +46,7 @@ public class Film {
         return likesByUsers.size();
     }
 
-    public boolean deleteLike(Integer userId) {
-        if (userId == null) return false;
+    public boolean deleteLike(long userId) {
         return likesByUsers.remove(userId);
     }
 }

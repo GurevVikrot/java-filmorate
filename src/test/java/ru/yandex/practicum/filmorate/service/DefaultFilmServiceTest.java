@@ -77,7 +77,7 @@ class DefaultFilmServiceTest {
 
     @Test
     void updateFilmWithoutId() {
-        assertThrows(ValidationException.class, () -> filmService.updateFilm(film));
+        assertThrows(StorageException.class, () -> filmService.updateFilm(film));
 
         film.setId(5);
         assertThrows(StorageException.class, () -> filmService.updateFilm(film));
@@ -86,7 +86,7 @@ class DefaultFilmServiceTest {
     @Test
     void getFilmByIdTest() {
         assertThrows(StorageException.class, () -> filmService.getFilm(-1));
-        assertThrows(StorageException.class, () -> filmService.getFilm(null));
+        assertThrows(StorageException.class, () -> filmService.getFilm(0));
 
         filmService.createFilm(film);
         assertEquals(film, filmService.getFilm(film.getId()));
@@ -106,8 +106,9 @@ class DefaultFilmServiceTest {
     @Test
     void spacesInNameFilmTest() {
         film.setName(" f ");
-        assertThrows(ValidationException.class, () -> filmService.createFilm(film));
-        assertThrows(ValidationException.class, () -> filmService.updateFilm(film));
+        assertEquals("f", filmService.createFilm(film).getName());
+        film.setName(" f ");
+        assertEquals("f", filmService.updateFilm(film).getName());
     }
 
     @Test
@@ -127,8 +128,9 @@ class DefaultFilmServiceTest {
     @Test
     void spacesInDescriptionFilmTest() {
         film.setDescription(" f ");
-        assertThrows(ValidationException.class, () -> filmService.createFilm(film));
-        assertThrows(ValidationException.class, () -> filmService.updateFilm(film));
+        assertEquals("f", filmService.createFilm(film).getDescription());
+        film.setDescription(" f ");
+        assertEquals("f", filmService.updateFilm(film).getDescription());
     }
 
     @Test
@@ -227,7 +229,7 @@ class DefaultFilmServiceTest {
         assertEquals(topFilms2, filmService.getTopFilms(10));
 
         int i = 0;
-        
+
         while (i < 20) {
             filmService.createFilm(new Film(i + 4 + "film", "desc", LocalDate.of(2020, 12, 12), 100));
             i++;

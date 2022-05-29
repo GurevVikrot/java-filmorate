@@ -12,8 +12,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,8 +68,8 @@ class DefaultUserServiceTest {
 
     @Test
     void updateWithNullIdTest() {
-        user.setId(null);
-        assertThrows(ValidationException.class, () -> userService.updateUser(user));
+        user.setId(0);
+        assertThrows(StorageException.class, () -> userService.updateUser(user));
     }
 
     @Test
@@ -91,7 +89,7 @@ class DefaultUserServiceTest {
     @Test
     void getUserTest() {
         assertThrows(StorageException.class, () -> userService.getUser(-1));
-        assertThrows(StorageException.class, () -> userService.getUser(null));
+        assertThrows(StorageException.class, () -> userService.getUser(0));
 
         userService.createUser(user);
         assertEquals(user, userService.getUser(user.getId()));
@@ -99,16 +97,16 @@ class DefaultUserServiceTest {
 
     @Test
     void setIdTest() {
-        assertNull(user.getId());
+        assertEquals(0, user.getId());
 
         userService.createUser(user);
-        User userInuserService = userService.getUsers().get(0);
-        assertNotNull(userInuserService.getId());
+        User userInUserService = userService.getUsers().get(0);
+        assertTrue(userInUserService.getId() > 0);
 
-        user.setId(null);
+        user.setId(0);
         userService.createUser(user);
-        User userInuserService2 = userService.getUsers().get(1);
-        assertNotNull(userInuserService2.getId());
+        User userInUserService2 = userService.getUsers().get(1);
+        assertTrue(userInUserService2.getId() > 0);
     }
 
     @Test
@@ -132,7 +130,7 @@ class DefaultUserServiceTest {
         assertThrows(StorageException.class, () -> userService.deleteUser(-1));
         assertTrue(userService.getUsers().isEmpty());
 
-        assertThrows(StorageException.class, () -> userService.deleteUser(null));
+        assertThrows(StorageException.class, () -> userService.deleteUser(0));
         assertTrue(userService.getUsers().isEmpty());
     }
 

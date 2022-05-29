@@ -8,19 +8,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    private final Map<Integer, User> users = new HashMap<>();
+    private static int idCounter = 1;
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
-    public boolean createUser(User user) {
-        if (!users.containsKey(user.getId())) {
+    public Optional<User> createUser(User user) {
+        if (user.getId() == 0) {
+            user.setId(idCounter++);
             users.put(user.getId(), user);
-            return true;
+            return Optional.of(user);
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
@@ -33,7 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUser(Integer id) {
+    public boolean deleteUser(long id) {
         if (users.containsKey(id)) {
             users.remove(id);
             return true;
@@ -43,8 +46,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Integer userId) {
-        return users.get(userId);
+    public Optional<User> getUser(long userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
@@ -53,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean userExist(Integer id) {
+    public boolean userExist(long id) {
         return users.containsKey(id);
     }
 }

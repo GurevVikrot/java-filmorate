@@ -84,15 +84,14 @@ public class UserTest {
     void addFriendTest() {
         assertTrue(user.addFriend(0));
         assertTrue(user.addFriend(1));
-        assertFalse(user.addFriend(null));
+        assertTrue(user.addFriend(2));
     }
 
     @Test
     void deleteFriendTest() {
-        assertTrue(user.addFriend(0));
-        assertTrue(user.removeFriend(0));
+        assertTrue(user.addFriend(1));
+        assertTrue(user.removeFriend(1));
         assertFalse(user.removeFriend(0));
-        assertFalse(user.addFriend(null));
     }
 
     @Test
