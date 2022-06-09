@@ -8,17 +8,20 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NotNull
 public class Film {
     private final LocalDate releaseDate;
+    private final Set<Long> likesByUsers = new HashSet<>();
 
     @NotNull
     @Positive(message = "Длительность фильма должна быть положительной")
     private final Integer duration;
 
-    private Integer id;
+    private long id;
 
     @NotBlank(message = "Название фильма не может быть пустым")
     @NotEmpty(message = "Название фильма не может быть пустым")
@@ -33,5 +36,17 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+    }
+
+    public boolean addLike(long userId) {
+        return likesByUsers.add(userId);
+    }
+
+    public int getLikesNumber() {
+        return likesByUsers.size();
+    }
+
+    public boolean deleteLike(long userId) {
+        return likesByUsers.remove(userId);
     }
 }

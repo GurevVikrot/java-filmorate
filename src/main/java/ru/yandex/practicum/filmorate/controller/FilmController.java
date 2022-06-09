@@ -1,87 +1,83 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.model.Film;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.util.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Map;
 
+@Validated
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
-    private static int idCounter = 0;
-    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+    private final FilmService filmService;
+
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @PostMapping
-    public String createFilm(@Valid @RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) {
         log.info("Получен для создания film: {}", film);
-        checkAndSetId(film);
-        checkSpace(film);
-        checkDateFilm(film);
-        films.put(film.getId(), film);
-        log.info("film: {} успешно создан", film);
-        return "Фильм успешно добавлен";
+        return filmService.createFilm(film);
     }
 
     @PutMapping
-    public String updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен для обновления film: {}", film);
+        return filmService.updateFilm(film);
+    }
 
-        if (film.getId() == null) {
-            log.warn("Фильма нет в коллекции или он не создан, невозможно обновить");
-            throw new ValidationException("Фильма нет в коллекции или он не создан, невозможно обновить");
-        }
-        checkSpace(film);
-        checkDateFilm(film);
-        films.put(film.getId(), film);
-        log.info("film: {} успешно обновлен", film);
-        return "Фильм успешно обновлен";
+    @DeleteMapping
+    public String deleteFilm(@RequestParam @NotNull Long id) {
+        return filmService.deleteFilm(id);
     }
 
     @GetMapping
     public List<Film> getFilms() {
-        return new ArrayList<>(films.values());
+        log.info("Получен запрос на получение всех фильмов");
+        return filmService.getFilms();
     }
 
-    private void checkDateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(MIN_DATE)) {
-            log.warn("Время выпуска фильма меньше минимальной даты: 28-12-1895 film: {}", film);
-            throw new ValidationException("Время выпуска фильма меньше минимальной даты: 28-12-1895");
-        }
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable @NotNull Long id) {
+        log.info("Получен запрос на получение фильма по id = {}", id);
+        return filmService.getFilm(id);
     }
 
-    private void checkAndSetId(Film film) {
-        if (film.getId() == null) {
-            film.setId(idCounter++);
-        } else if (film.getId() >= 0) {
-            log.warn("Ошибка создания фильма, получен фильм с изначально заданным id");
-            throw new ValidationException("Ошибка создания фильма, неверный формат id");
-        }
+    @GetMapping("/popular")
+    public List<Film> getTopFilms(@RequestParam(required = false, defaultValue = "10") @Positive String count) {
+        log.info("Получен запрос на получение топ {} фильмов", count);
+        return filmService.getTopFilms(Integer.parseInt(count));
     }
 
-    private void checkSpace(Film film) {
-        if (film.getName().startsWith(" ")) {
-            log.warn("Ошибка создания фильма, название начинается с ' '");
-            throw new ValidationException("Ошибка создания фильма, название не может начинаться с пробела");
-        } else if (film.getDescription().startsWith(" ")) {
-            log.warn("Ошибка создания фильма, описание начинается с ' '");
-            throw new ValidationException("Ошибка создания фильма, описание не может начинаться с пробела");
-        } else {
-            film.setName(film.getName().trim());
-            film.setDescription(film.getDescription().trim());
-        }
+    @PutMapping("/{id}/like/{userId}")
+    public boolean addLikeToFilm(@PathVariable @NotNull Long id,
+                                 @PathVariable @NotNull Long userId) {
+        log.info("Получен запрос на добавления like фильму id = {} от пользователя id {}", id, userId);
+        return filmService.addLikeToFilm(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public boolean deleteLikeFromFilm(@PathVariable @NotNull Long id,
+                                      @PathVariable @NotNull Long userId) {
+        log.info("Получен запрос на удаления like фильма id = {} от пользователя id {}", id, userId);
+        return filmService.removeLikeFromFilm(id, userId);
     }
 }

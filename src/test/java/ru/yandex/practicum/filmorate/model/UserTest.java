@@ -9,6 +9,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -77,5 +78,37 @@ public class UserTest {
     void futureBirthdayTest() {
         user.setBirthday(LocalDate.of(2045, 10, 10));
         assertFalse(validator.validate(user).isEmpty());
+    }
+
+    @Test
+    void addFriendTest() {
+        assertTrue(user.addFriend(0));
+        assertTrue(user.addFriend(1));
+        assertTrue(user.addFriend(2));
+    }
+
+    @Test
+    void deleteFriendTest() {
+        assertTrue(user.addFriend(1));
+        assertTrue(user.removeFriend(1));
+        assertFalse(user.removeFriend(0));
+    }
+
+    @Test
+    void getFriendsTest() {
+        assertTrue(user.getFriendsId().isEmpty());
+
+        user.addFriend(0);
+        user.addFriend(1);
+        user.addFriend(2);
+        user.addFriend(3);
+        assertEquals(4, user.getFriendsId().size());
+
+        user.removeFriend(0);
+        user.removeFriend(1);
+        user.removeFriend(2);
+        user.addFriend(3);
+        assertEquals(1, user.getFriendsId().size());
+        assertEquals(3, user.getFriendsId().get(0));
     }
 }
