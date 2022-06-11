@@ -109,7 +109,7 @@ Template repository for Filmorate project.
      FROM user_friends AS nuf
      LEFT OUTER JOIN users ON nuf.friend_id = users.user_id
      WHERE user_id = N AND
-     WHERE user_id IN (SELECT users.user_id AS n_friends
+     	   user_id IN (SELECT users.user_id AS n_friends
      FROM user_friends AS tuf
      LEFT OUTER JOIN users ON tuf.friend_id = users.user_id
      WHERE user_id = T);
@@ -126,7 +126,7 @@ Template repository for Filmorate project.
      FROM film_likes AS fl
      INNER JOIN films ON fl.film_id = films.film_id
      GROUP BY fl.film_id
-     ORDER BY COUNT(user_id) DESC
+     ORDER BY likes DESC
      LIMIT 10;
 
   **Вывод жанра/жанров фильма N:**
@@ -139,7 +139,7 @@ Template repository for Filmorate project.
 
    **Вывод рейтинга фильма N:**
     
-     SELECT films.name
+     SELECT films.name,
 	        r.rating
      FROM films
      INNER JOIN rating_mpa AS r ON films.rating = r.rating_id
