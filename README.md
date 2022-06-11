@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 ## *[Диаграмма](https://dbdiagram.io/d/629e6c3f54ce2635276e8216) базы данных filmorate*
-![db_diagram](/filmorate_db_diagram.png?raw=true)
+![db_diagram](/db_diagram.png?raw=true)
 
 ## Опиcание диаграммы
  **users:**
