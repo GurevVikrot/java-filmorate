@@ -16,6 +16,8 @@ import java.util.Set;
 public class Film {
     private final LocalDate releaseDate;
     private final Set<Long> likesByUsers = new HashSet<>();
+    private Set<Genre> genres;
+    private RatingMpa mpa;
 
     @NotNull
     @Positive(message = "Длительность фильма должна быть положительной")

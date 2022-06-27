@@ -43,14 +43,14 @@ class InMemoryFilmStorageTest {
         Film updatedFilm = new Film("Up", "date", LocalDate.of(2020, 12, 12), 100);
         updatedFilm.setId(1);
 
-        assertTrue(filmStorage.updateFilm(updatedFilm));
+        assertTrue(filmStorage.updateFilm(updatedFilm).isPresent());
         assertEquals(updatedFilm, filmStorage.getFilm(updatedFilm.getId()).orElse(null));
         assertEquals(1, filmStorage.getFilms().size());
     }
 
     @Test
     void updateNonexistentFilm() {
-        assertFalse(filmStorage.updateFilm(film));
+        assertFalse(filmStorage.updateFilm(film).isPresent());
         assertEquals(0, filmStorage.getFilms().size());
     }
 

@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.util.StorageException;
 import ru.yandex.practicum.filmorate.util.ValidationException;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,8 @@ import java.util.Optional;
 @Slf4j
 public class DefaultFilmService implements FilmService {
     private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    protected final FilmStorage filmStorage;
+    protected final UserStorage userStorage;
 
     @Autowired
     public DefaultFilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -46,9 +47,18 @@ public class DefaultFilmService implements FilmService {
         checkSpace(film);
         checkDateFilm(film);
 
-        if (filmStorage.updateFilm(film)) {
+        if (film.getId() >= 0 && filmStorage.updateFilm(film).isPresent()) {
+
             log.info("film успешно обновлен: {}", film);
-            return getFromStorage(film.getId());
+            Film updatedFilm = getFromStorage(film.getId());
+
+            // Проверка из-за теста Film update remove genre где требуется получить пустой массив
+            // При этом остальные тесты проверяют на null
+            if (film.getGenres() != null && film.getGenres().isEmpty()) {
+                updatedFilm.setGenres(new LinkedHashSet<>());
+            }
+
+            return updatedFilm;
         }
 
         log.warn("Ошибка обновления фильма, фильма не существует: {}", film);
@@ -81,7 +91,6 @@ public class DefaultFilmService implements FilmService {
         Film film = getFromStorage(filmId);
 
         if (userStorage.userExist(userId) && film.addLike(userId)) {
-            filmStorage.updateFilm(film);
             log.info("Добавлен like фильму {} от пользователя с id = {}", filmId, userId);
             return true;
         }
@@ -96,7 +105,6 @@ public class DefaultFilmService implements FilmService {
         Film film = getFromStorage(filmId);
 
         if (userStorage.userExist(userId) && film.deleteLike(userId)) {
-            filmStorage.updateFilm(film);
             log.info("Удален like у фильма id = {} от пользователя с id = {}", filmId, userId);
             return true;
         }

@@ -22,4 +22,6 @@ public interface UserService {
     String removeFromFriends(long userId, long friendId);
 
     User getUser(long id);
+
+    User confirmFriendship(Long id, Long otherId);
 }

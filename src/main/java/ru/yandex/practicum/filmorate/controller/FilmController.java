@@ -45,7 +45,7 @@ public class FilmController {
     }
 
     @DeleteMapping
-    public String deleteFilm(@RequestParam @NotNull Long id) {
+    public String deleteFilm(@RequestParam @NotNull @Positive Long id) {
         return filmService.deleteFilm(id);
     }
 
@@ -56,7 +56,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film getFilm(@PathVariable @NotNull Long id) {
+    public Film getFilm(@PathVariable @NotNull @Positive Long id) {
         log.info("Получен запрос на получение фильма по id = {}", id);
         return filmService.getFilm(id);
     }
@@ -68,15 +68,15 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public boolean addLikeToFilm(@PathVariable @NotNull Long id,
-                                 @PathVariable @NotNull Long userId) {
+    public boolean addLikeToFilm(@PathVariable @NotNull @Positive Long id,
+                                 @PathVariable @NotNull @Positive Long userId) {
         log.info("Получен запрос на добавления like фильму id = {} от пользователя id {}", id, userId);
         return filmService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public boolean deleteLikeFromFilm(@PathVariable @NotNull Long id,
-                                      @PathVariable @NotNull Long userId) {
+    public boolean deleteLikeFromFilm(@PathVariable @NotNull @Positive Long id,
+                                      @PathVariable @NotNull @Positive Long userId) {
         log.info("Получен запрос на удаления like фильма id = {} от пользователя id {}", id, userId);
         return filmService.removeLikeFromFilm(id, userId);
     }
