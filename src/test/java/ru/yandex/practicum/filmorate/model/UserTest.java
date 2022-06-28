@@ -67,6 +67,8 @@ public class UserTest {
     void incorrectLoginTest() {
         User userTester = new User("a@mail.ru", " ", "name", LocalDate.of(1990, 10, 10));
         assertFalse(validator.validate(userTester).isEmpty());
+        userTester.setLogin("");
+        assertFalse(validator.validate(userTester).isEmpty());
     }
 
     @Test

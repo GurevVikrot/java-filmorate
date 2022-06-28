@@ -21,8 +21,8 @@ public class User {
     private String login;
     private long id;
 
-    @NotNull(message = "email не может быть пустым")
-    @NotBlank
+
+    @NotBlank(message = "email не может быть пустым")
     @Email(message = "не верный формат email")
     private String email;
     private String name;
