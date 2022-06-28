@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.user.FriendshipDAO;
@@ -18,12 +19,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DbUserService extends DefaultUserService {
     private final FriendshipDAO friendshipStorage;
-    private final UserStorage storage;
 
+    @Autowired
     public DbUserService(UserStorage userStorage, FriendshipDAO friendshipStorage) {
         super(userStorage);
         this.friendshipStorage = friendshipStorage;
-        this.storage = userStorage;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class DbUserService extends DefaultUserService {
 
     private boolean checkIds(long userId, long friendId) {
         return !Objects.equals(userId, friendId)
-                && storage.userExist(userId)
-                && storage.userExist(friendId);
+                && userStorage.userExist(userId)
+                && userStorage.userExist(friendId);
     }
 }

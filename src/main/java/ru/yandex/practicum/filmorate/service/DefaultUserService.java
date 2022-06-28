@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class DefaultUserService implements UserService {
-    private final UserStorage userStorage;
+    protected final UserStorage userStorage;
 
     @Autowired
     public DefaultUserService(UserStorage userStorage) {

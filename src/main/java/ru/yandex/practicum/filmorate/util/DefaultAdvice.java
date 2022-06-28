@@ -22,7 +22,7 @@ public class DefaultAdvice {
 
     @ExceptionHandler
     public ResponseEntity<?> exc(ConstraintViolationException ex){
-        return new ResponseEntity<>("Ошибка валидации, проверьте передаваемые значения. " +
+        return new ResponseEntity<>("Запрошенных данных не существует, проверьте передаваемые значения. " +
                 "Они должны быть существующими и быть больше 0"
                 , HttpStatus.NOT_FOUND);
     }
