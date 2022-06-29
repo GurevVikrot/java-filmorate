@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Validated
@@ -43,13 +45,13 @@ public class UserController {
     }
 
     @DeleteMapping
-    public String deleteUser(@PathVariable @NotNull Long id) {
+    public String deleteUser(@RequestParam @NotNull Long id) {
         log.info("Получен для удаления user с id {}", id);
         return userService.deleteUser(id);
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable @NotNull Long id) {
+    public User getUser(@PathVariable @Positive @NotNull Long id) {
         log.info("Получен запрос на получение пользователя id = {}", id);
         return userService.getUser(id);
     }
@@ -85,5 +87,12 @@ public class UserController {
                                      @PathVariable @NotNull Long otherId) {
         log.info("Запрос получения общих друзей пользователя id = {} и пользователя id = {}", id, otherId);
         return userService.getMutualFriends(id, otherId);
+    }
+
+    @PutMapping("/{id}/friends/{otherId}/status")
+    public User confirmFriendship(@PathVariable @NotNull Long id,
+                                    @PathVariable @NotNull Long otherId) {
+        log.info("Запрос подтверждения дружбы id = {} и id = {}", id, otherId);
+        return userService.confirmFriendship(id, otherId);
     }
 }

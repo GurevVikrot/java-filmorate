@@ -26,12 +26,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean updateFilm(Film film) {
+    public Optional<Film> updateFilm(Film film) {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            return true;
+            return Optional.of(film);
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override

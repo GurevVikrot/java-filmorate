@@ -33,6 +33,7 @@ class InMemoryUserStorageTest {
         assertEquals(user1, storage.getUser(user.getId()).orElse(null));
     }
 
+
     @Test
     void updateUserTest() {
         storage.createUser(user);

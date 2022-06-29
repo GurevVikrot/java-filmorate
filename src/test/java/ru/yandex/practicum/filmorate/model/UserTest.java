@@ -67,6 +67,8 @@ public class UserTest {
     void incorrectLoginTest() {
         User userTester = new User("a@mail.ru", " ", "name", LocalDate.of(1990, 10, 10));
         assertFalse(validator.validate(userTester).isEmpty());
+        userTester.setLogin("");
+        assertFalse(validator.validate(userTester).isEmpty());
     }
 
     @Test
@@ -82,14 +84,14 @@ public class UserTest {
 
     @Test
     void addFriendTest() {
-        assertTrue(user.addFriend(0));
-        assertTrue(user.addFriend(1));
-        assertTrue(user.addFriend(2));
+        assertTrue(user.addFriend(0, false));
+        assertTrue(user.addFriend(1, false));
+        assertTrue(user.addFriend(2, false));
     }
 
     @Test
     void deleteFriendTest() {
-        assertTrue(user.addFriend(1));
+        assertTrue(user.addFriend(1, false));
         assertTrue(user.removeFriend(1));
         assertFalse(user.removeFriend(0));
     }
@@ -98,16 +100,16 @@ public class UserTest {
     void getFriendsTest() {
         assertTrue(user.getFriendsId().isEmpty());
 
-        user.addFriend(0);
-        user.addFriend(1);
-        user.addFriend(2);
-        user.addFriend(3);
+        user.addFriend(0, false);
+        user.addFriend(1, false);
+        user.addFriend(2, false);
+        user.addFriend(3, false);
         assertEquals(4, user.getFriendsId().size());
 
         user.removeFriend(0);
         user.removeFriend(1);
         user.removeFriend(2);
-        user.addFriend(3);
+        user.addFriend(3, false);
         assertEquals(1, user.getFriendsId().size());
         assertEquals(3, user.getFriendsId().get(0));
     }

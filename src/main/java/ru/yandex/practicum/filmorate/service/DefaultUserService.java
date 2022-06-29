@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class DefaultUserService implements UserService {
-    private final UserStorage userStorage;
+    protected final UserStorage userStorage;
 
     @Autowired
     public DefaultUserService(UserStorage userStorage) {
@@ -65,7 +65,13 @@ public class DefaultUserService implements UserService {
 
     @Override
     public List<User> getUsers() {
-        return userStorage.getAllUsers();
+        List<User> users = userStorage.getAllUsers();
+        if (users.isEmpty()) {
+            log.warn("При получении списка всех пользователей вернулся пустой список");
+        } else {
+            log.info("Запрос успешен");
+        }
+        return users;
     }
 
     @Override
@@ -97,8 +103,8 @@ public class DefaultUserService implements UserService {
     @Override
     public User addToFriends(long userId, long friendId) {
         if (!Objects.equals(userId, friendId)) {
-            if (getFromStorage(userId).addFriend(friendId) &&
-                    getFromStorage(friendId).addFriend(userId)) {
+            if (getFromStorage(userId).addFriend(friendId, true) &&
+                    getFromStorage(friendId).addFriend(userId, true)) {
                 log.info("Пользователи id = {} и id = {} взаимно добавлены в друзья", userId, friendId);
                 return getFromStorage(friendId);
             } else {
@@ -133,6 +139,11 @@ public class DefaultUserService implements UserService {
     @Override
     public User getUser(long id) {
         return getFromStorage(id);
+    }
+
+    @Override
+    public User confirmFriendship(Long id, Long otherId) {
+        return null;
     }
 
     private void checkLoginAndName(User user) {

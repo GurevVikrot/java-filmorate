@@ -23,21 +23,13 @@ Template repository for Filmorate project.
      
     Содержит информацию о друзьях пользователя
      
-    id - Первичный составной ключ (user_id, friend_id);
+    Первичный составной ключ (user_id, friend_id);
      
     user_id - id пользователя;
      
     friend_id - id друга пользователя;
      
-    status_id - id статуса дружбы пользователей.
-     
-  **friend_status:**
-     
-    Содержит информацию о статусах дружбы
-     
-    status_id - Первичный ключ, id статуса дружбы;
-     
-    status - Название статуса дружбы.
+    status - boolean статуса дружбы пользователей.
     
   **films:**
   
@@ -58,8 +50,10 @@ Template repository for Filmorate project.
   **film_likes:**
   
     Связующая таблица, содержит информацию о том, кто ставил лайк фильму
+
+    Первичный составной ключ (film_id, user_id);
   
-    film_id - Первичный ключ, id фильма;
+    film_id -  id фильма;
   
     user_id - id пользователя.
   
@@ -74,8 +68,10 @@ Template repository for Filmorate project.
   **film_genre:**
   
     Связующая таблица, содержит информацию о том к какому жанру/жанрам относится фильм
+
+    Первичный составной ключ (film_id, genre_id);
   
-    film_id - Первичный ключ, id фильма;
+    film_id - id фильма;
 
     genre_id - id жанра.
   
@@ -83,7 +79,7 @@ Template repository for Filmorate project.
   
     Сожержит информацию о рейтингах Motion Picture Association (МРА)
     
-    raiting_id - id рейтинга;
+    raiting_id - id рейтинга. Первичный ключ;
     
     rating - Название рейтинга.
     
@@ -97,29 +93,27 @@ Template repository for Filmorate project.
      
    **Вывод всех друзей пользователя N и статуса дружбы**
    
-     SELECT users.name AS name_of_friends
+     SELECT users.name AS name_of_friends,
+            uf.status
      FROM user_friends AS uf
      LEFT OUTER JOIN users ON uf.friend_id = users.user_id
-     LEFT OUTER JOIN friend_status AS fs ON uf.status_id = fs.status_id
      WHERE user_id = N;
 
   **Вывод общих друзей пользователя N и пользователя T:**
-    
-     SELECT users.user_id AS n_t_friends
-     FROM user_friends AS nuf
-     LEFT OUTER JOIN users ON nuf.friend_id = users.user_id
-     WHERE user_id = N AND
-     	   user_id IN (SELECT users.user_id AS n_friends
-     FROM user_friends AS tuf
-     LEFT OUTER JOIN users ON tuf.friend_id = users.user_id
-     WHERE user_id = T);
+
+     SELECT friend_id 
+     FROM user_friends 
+     WHERE user_id = ? AND friend_id IN
+                    (SELECT friend_id
+                     FROM user_friends 
+                     WHERE user_id = ?)
 
   **Вывод всех фильмов:**
     
      SELECT *
      FROM films;
      
-  **Вывод топ 10 фильмов и количества лайков к ним:**
+  **Вывод топ 10 названий фильмов и количества лайков к ним:**
    
      SELECT films.name AS film,
 	        COUNT(user_id) AS likes
